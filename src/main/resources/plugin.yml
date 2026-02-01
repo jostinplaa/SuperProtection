@@ -19,3 +19,21 @@ permissions:
   protectium.bypass:
     description: "Inmune a todas las protecciones activas."
     default: op
+  protectium.place:
+    description: "Permite colocar protecciones."
+    default: true
+  protectium.unlimited:
+    description: "Sin límite de protecciones."
+    default: op
+  protectium.limit.vip:
+    description: "15 protecciones máx, radio 48."
+    default: false
+  protectium.limit.vipplus:
+    description: "20 protecciones máx, radio 64."
+    default: false
+  protectium.limit.mvp:
+    description: "30 protecciones máx, radio 96."
+    default: false
+  protectium.limit.mvpplus:
+    description: "50 protecciones máx, radio 128."
+    default: false

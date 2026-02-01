@@ -9,6 +9,28 @@
 #   5. Romper el bloque = protección eliminada. Sin excepciones.
 # ================================================================
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# SISTEMA DE LÍMITES POR JUGADOR
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+limits:
+  # Número máximo de protecciones para jugadores default
+  default-protections: 5
+  
+  # Radio máximo permitido para jugadores default
+  default-radius: 32
+  
+  # Permisos de límites:
+  # - protectium.limit.vip → 15 protecciones, radio 48
+  # - protectium.limit.vipplus → 20 protecciones, radio 64
+  # - protectium.limit.mvp → 30 protecciones, radio 96
+  # - protectium.limit.mvpplus → 50 protecciones, radio 128
+  # - protectium.unlimited → sin límite de protecciones
+  # - protectium.bypass → ignora todos los límites
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# NBT Y VERSIÓN
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 nbt:
   namespace: "protectium"
   version: 1

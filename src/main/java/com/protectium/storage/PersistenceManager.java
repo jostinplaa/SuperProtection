@@ -180,4 +180,38 @@ public final class PersistenceManager {
         logger.info("§a Cargadas " + loaded + " protecciones. §7(" + skipped + " omitidas)");
         return loaded;
     }
+
+    /**
+     * Crea un backup de emergencia cuando falla el guardado normal.
+     * Usa timestamp en el nombre del archivo.
+     */
+    public void createEmergencyBackup() throws IOException {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        File backupFile = new File(plugin.getDataFolder(), "protections_emergency_" + timestamp + ".yml");
+        
+        FileConfiguration data = new YamlConfiguration();
+        List<ProtectionRecord> protecciones = registry.todas();
+        
+        data.set("meta.emergency-backup", true);
+        data.set("meta.timestamp", timestamp);
+        data.set("meta.count", protecciones.size());
+        
+        for (ProtectionRecord rec : protecciones) {
+            String path = "protections." + rec.getId().toString();
+            
+            data.set(path + ".tipo", rec.getTipo().getConfigKey());
+            data.set(path + ".colocado-por", rec.getColocadoPor().toString());
+            data.set(path + ".marca-tiempo", rec.getMarcaTiempo());
+            data.set(path + ".radio", rec.getRadio());
+            
+            Location loc = rec.getUbicacionBloque();
+            data.set(path + ".ubicacion.mundo", loc.getWorld().getName());
+            data.set(path + ".ubicacion.x", loc.getBlockX());
+            data.set(path + ".ubicacion.y", loc.getBlockY());
+            data.set(path + ".ubicacion.z", loc.getBlockZ());
+        }
+        
+        data.save(backupFile);
+        logger.warning("Backup de emergencia creado: " + backupFile.getName());
+    }
 }

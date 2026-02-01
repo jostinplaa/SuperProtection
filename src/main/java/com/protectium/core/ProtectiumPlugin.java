@@ -26,8 +26,10 @@ public final class ProtectiumPlugin extends JavaPlugin {
     private FxEngine fxEngine;
     private GuiManager guiManager;
     private Mensajes mensajes;
+    private MessageManager messageManager;
     private PersistenceManager persistenceManager;
     private com.protectium.shop.ShopManager shopManager;
+    private LimitManager limitManager;
 
     @Override
     public void onEnable() {
@@ -55,11 +57,13 @@ public final class ProtectiumPlugin extends JavaPlugin {
         this.registry = new ProtectionRegistry();
         this.itemAuthority = new ItemAuthority(this);
         this.mensajes = new Mensajes(getConfig());
+        this.messageManager = new MessageManager(this);
         this.fxEngine = new FxEngine(getConfig());
         this.fxEngine.setPlugin(this);
         this.guiManager = new GuiManager(registry, mensajes);
         this.persistenceManager = new PersistenceManager(this, registry);
         this.shopManager = new com.protectium.shop.ShopManager(this);
+        this.limitManager = new LimitManager(this);
     }
 
     public com.protectium.shop.ShopManager getShopManager() {
@@ -67,15 +71,33 @@ public final class ProtectiumPlugin extends JavaPlugin {
     }
 
     private void cargarDatos() {
-        int loaded = persistenceManager.loadAll();
-        if (loaded > 0) {
-            getLogger().info("Restauradas " + loaded + " protecciones.");
+        try {
+            int loaded = persistenceManager.loadAll();
+            if (loaded > 0) {
+                getLogger().info(messageManager.getSystemLoadingSuccess(loaded));
+            }
+        } catch (Exception e) {
+            getLogger().severe("ERROR al cargar protecciones desde disco: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
     private void guardarDatos() {
         if (persistenceManager != null) {
-            persistenceManager.saveAll();
+            try {
+                persistenceManager.saveAll();
+                getLogger().info("Protecciones guardadas exitosamente.");
+            } catch (Exception e) {
+                getLogger().severe("ERROR CRÍTICO al guardar protecciones en shutdown: " + e.getMessage());
+                e.printStackTrace();
+                // Intentar crear backup de emergencia
+                try {
+                    persistenceManager.createEmergencyBackup();
+                    getLogger().warning("Backup de emergencia creado.");
+                } catch (Exception backupError) {
+                    getLogger().severe("No se pudo crear backup de emergencia!");
+                }
+            }
         }
     }
 
@@ -118,14 +140,26 @@ public final class ProtectiumPlugin extends JavaPlugin {
     }
 
     private void iniciarTareas() {
-        new FxTickTask(fxEngine, registry).runTaskTimerAsynchronously(this, 0, 2);
-        new ConsistencyTask(registry, itemAuthority, this).runTaskTimer(this, 1200L, 1200L); // Cada 60s
-        new FxTickTask(fxEngine, registry).runTaskTimer(this, 1L, 1L);
-        new com.protectium.task.BossBarTask(registry).runTaskTimer(this, 10L, 10L); // Cada 0.5s check bossbar
+        // FxTickTask - Solo UNA tarea asíncrona optimizada
+        new FxTickTask(fxEngine, registry).runTaskTimerAsynchronously(this, 1L, 1L);
+        
+        // Tarea de consistencia cada 60 segundos
+        new ConsistencyTask(registry, itemAuthority, this).runTaskTimer(this, 1200L, 1200L);
+        
+        // BossBar task cada 0.5 segundos
+        new com.protectium.task.BossBarTask(registry).runTaskTimer(this, 10L, 10L);
+        
+        // Auto-guardado cada 5 minutos (6000 ticks) con manejo de errores
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
             @Override
             public void run() {
-                persistenceManager.saveAll();
+                try {
+                    persistenceManager.saveAll();
+                    getLogger().info(messageManager.getSystemAutosaveSuccess(registry.cantidad()));
+                } catch (Exception e) {
+                    getLogger().severe("ERROR CRÍTICO al auto-guardar protecciones: " + e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }, 6000L, 6000L);
     }
@@ -155,6 +189,14 @@ public final class ProtectiumPlugin extends JavaPlugin {
 
     public Mensajes getMensajes() {
         return mensajes;
+    }
+
+    public MessageManager getMessageManager() {
+        return messageManager;
+    }
+
+    public LimitManager getLimitManager() {
+        return limitManager;
     }
 
     public PersistenceManager getPersistenceManager() {

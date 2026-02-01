@@ -1,0 +1,672 @@
+# ╔════════════════════════════════════════════════════════════════════════════╗
+# ║                                                                            ║
+# ║                    ⚔  P R O T E C T I U M  ⚔                              ║
+# ║                         Sistema de Mensajes                                ║
+# ║                                                                            ║
+# ║  Personaliza completamente todos los mensajes del plugin                   ║
+# ║  Soporta códigos de color de Minecraft (&, §)                              ║
+# ║  Usa {variables} para contenido dinámico                                   ║
+# ║                                                                            ║
+# ╚════════════════════════════════════════════════════════════════════════════╝
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🎨 PREFIJOS Y DECORACIONES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+prefixes:
+  # Prefijo general para mensajes informativos
+  general: "&8⛏ &b&lPROTECTIUM&8 »&r "
+  
+  # Prefijo para mensajes de error
+  error: "&8⛏ &c&lPROTECTIUM&8 »&r "
+  
+  # Prefijo para mensajes de éxito
+  success: "&8⛏ &a&lPROTECTIUM&8 »&r "
+  
+  # Prefijo para mensajes de advertencia
+  warning: "&8⛏ &e&lPROTECTIUM&8 »&r "
+  
+  # Prefijo para mensajes de sistema/debug
+  system: "&8⛏ &7&lPROTECTIUM&8 »&r "
+
+# Separadores decorativos
+separators:
+  # Línea simple
+  simple: "&8═══════════════════════════════════════════"
+  
+  # Línea con puntos
+  dotted: "&8·········································"
+  
+  # Línea gruesa
+  thick: "&8━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  
+  # Línea doble
+  double: "&8╔════════════════════════════════════════╗"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 💬 MENSAJES DE COMANDOS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+commands:
+  
+  # ┌─────────────────────────────────────────────────────────────┐
+  # │ AYUDA Y LISTADO DE COMANDOS                                 │
+  # └─────────────────────────────────────────────────────────────┘
+  help:
+    header: |
+      &8╔════════════════════════════════════════════════════════╗
+      &8║          &b&l⚔ PROTECTIUM &8- &7Comandos Disponibles &8║
+      &8╠════════════════════════════════════════════════════════╣
+    
+    commands:
+      - "&8║  &b/prot dar <tipo> <radio> <jugador>"
+      - "&8║    &7→ Otorga un ítem de protección"
+      - "&8║"
+      - "&8║  &b/prot crear <tipo> <radio> <nombre> [material]"
+      - "&8║    &7→ Crea protección personalizada"
+      - "&8║"
+      - "&8║  &b/prot lista [mundo]"
+      - "&8║    &7→ Muestra protecciones activas"
+      - "&8║"
+      - "&8║  &b/prot tipos"
+      - "&8║    &7→ Lista tipos de protección"
+      - "&8║"
+      - "&8║  &b/prot info <jugador>"
+      - "&8║    &7→ Información de jugador"
+      - "&8║"
+      - "&8║  &b/prot recargar"
+      - "&8║    &7→ Recarga configuración"
+      - "&8║"
+      - "&8║  &b/prot tienda"
+      - "&8║    &7→ Abre la tienda de protecciones"
+      - "&8║"
+      - "&8║  &b/prot addshop <precio>"
+      - "&8║    &7→ Añade ítem en mano a tienda"
+    
+    footer: "&8╚════════════════════════════════════════════════════════╝"
+  
+  # ┌─────────────────────────────────────────────────────────────┐
+  # │ COMANDO DAR                                                  │
+  # └─────────────────────────────────────────────────────────────┘
+  give:
+    success: |
+      &a&l✔ ¡Ítem entregado exitosamente!
+      &7▪ &fTipo: &b{tipo}
+      &7▪ &fRadio: &e{radio} bloques
+      &7▪ &fDestinatario: &a{player}
+    
+    inventory-full: "&c&l✖ &cEl inventario de &f{player}&c está lleno."
+    
+    usage: "&cUso: &f/prot dar <tipo> <radio> <jugador>"
+  
+  # ┌─────────────────────────────────────────────────────────────┐
+  # │ COMANDO CREAR                                                │
+  # └─────────────────────────────────────────────────────────────┘
+  create:
+    success: |
+      &a&l✔ ¡Protección personalizada creada!
+      &7▪ &fNombre: &b{name}
+      &7▪ &fTipo: &d{tipo}
+      &7▪ &fRadio: &e{radio} bloques
+      &7▪ &fMaterial: &6{material}
+    
+    usage: "&cUso: &f/prot crear <tipo> <radio> <nombre> [material]"
+  
+  # ┌─────────────────────────────────────────────────────────────┐
+  # │ COMANDO LISTA                                                │
+  # └─────────────────────────────────────────────────────────────┘
+  list:
+    header: |
+      &8╔════════════════════════════════════════════════════════╗
+      &8║     &b&l⬡ PROTECCIONES ACTIVAS &8- &7Mundo: &f{world} &8║
+      &8╠════════════════════════════════════════════════════════╣
+    
+    entry: "&8║  &b#{number} &8| &7{tipo} &8| &fRadio: &e{radio} &8| &7Dueño: &a{owner}"
+    
+    empty: "&8║  &7&o(No hay protecciones activas)"
+    
+    footer: |
+      &8╠════════════════════════════════════════════════════════╣
+      &8║  &7Total: &b{total} &7protección(es)
+      &8╚════════════════════════════════════════════════════════╝
+  
+  # ┌─────────────────────────────────────────────────────────────┐
+  # │ COMANDO TIPOS                                                │
+  # └─────────────────────────────────────────────────────────────┘
+  types:
+    header: |
+      &8╔════════════════════════════════════════════════════════╗
+      &8║        &b&l⬡ TIPOS DE PROTECCIÓN DISPONIBLES &8║
+      &8╠════════════════════════════════════════════════════════╣
+    
+    area: |
+      &8║  &b⬡ ÁREA &8(&7area&8)
+      &8║    &7→ Bloquea romper y colocar bloques
+    
+    spawn: |
+      &8║  &d⬡ ANTI-SPAWN &8(&7spawn&8)
+      &8║    &7→ Previene spawn de mobs hostiles
+    
+    entrada: |
+      &8║  &c⬡ ENTRADA RESTRINGIDA &8(&7entrada&8)
+      &8║    &7→ Impide entrada de jugadores
+    
+    fuego: |
+      &8║  &6⬡ ANTI-FUEGO &8(&7fuego&8)
+      &8║    &7→ Bloquea propagación de fuego
+    
+    redstone: |
+      &8║  &5⬡ ANTI-REDSTONE &8(&7redstone&8)
+      &8║    &7→ Deshabilita circuitos redstone
+    
+    footer: "&8╚════════════════════════════════════════════════════════╝"
+  
+  # ┌─────────────────────────────────────────────────────────────┐
+  # │ COMANDO RECARGAR                                             │
+  # └─────────────────────────────────────────────────────────────┘
+  reload:
+    starting: "&e&l⟳ &eRecargando configuración..."
+    
+    success: |
+      &a&l✔ ¡Configuración recargada!
+      &7▪ &fArchivos: &aconfig.yml, messages.yml
+      &7▪ &fProtecciones: &b{protections} &7conservadas
+      &7▪ &fEfectos: &dcache limpiado
+    
+    error: "&c&l✖ &cError al recargar: &f{error}"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ⚠️ MENSAJES DE ERROR
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+errors:
+  # Errores de validación
+  invalid-type: |
+    &c&l✖ Tipo de protección inválido: &f{tipo}
+    &7Usa &f/prot tipos &7para ver los disponibles.
+  
+  invalid-radius: "&c&l✖ &cRadio inválido: &f{radius}&c. Debe ser un número positivo."
+  
+  radius-exceeds-max: "&c&l✖ &cEl radio &f{radius}&c excede el máximo permitido: &f{max}"
+  
+  player-not-found: "&c&l✖ &cJugador no encontrado: &f{player}"
+  
+  # Errores de permisos
+  no-permission: |
+    &c&l✖ ¡Acceso denegado!
+    &7No tienes permisos para usar este comando.
+  
+  no-permission-place: |
+    &c&l✖ ¡No puedes colocar protecciones aquí!
+    &7Esta zona está restringida.
+  
+  # Errores de límites
+  limit-reached: |
+    &c&l✖ ¡Límite alcanzado!
+    &7Has alcanzado el máximo de &f{limit} &7protecciones.
+    &7Elimina alguna o mejora tu rango.
+  
+  limit-radius: |
+    &c&l✖ ¡Radio muy grande!
+    &7Tu límite de radio es: &f{max} bloques
+    &7Mejora tu rango para radios mayores.
+  
+  # Errores de ubicación
+  overlap-protection: |
+    &c&l✖ ¡Zona ocupada!
+    &7Ya existe una protección de tipo &f{tipo}&7 aquí.
+    &7Ubicación: &f{location}
+  
+  worldguard-region: |
+    &c&l✖ ¡Zona protegida por WorldGuard!
+    &7No puedes colocar protecciones en región: &f{region}
+  
+  # Errores de ítem
+  not-protection-item: |
+    &c&l✖ ¡Este no es un ítem de protección válido!
+    &7El ítem ha sido modificado o es falso.
+  
+  item-damaged: |
+    &c&l✖ ¡Ítem de protección dañado!
+    &7Los datos NBT están corruptos.
+    &7Contacta a un administrador.
+  
+  # Errores de sistema
+  database-error: |
+    &c&l✖ &4¡ERROR DE BASE DE DATOS!
+    &7No se pudo guardar la protección.
+    &7Contacta a un administrador urgentemente.
+  
+  internal-error: |
+    &c&l✖ &4¡ERROR INTERNO!
+    &7Ocurrió un error inesperado: &f{error}
+    &7Reporta esto a un administrador.
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🛡️ MENSAJES DE PROTECCIÓN
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+protection:
+  
+  # ┌─────────────────────────────────────────────────────────────┐
+  # │ ACTIVACIÓN DE PROTECCIÓN                                     │
+  # └─────────────────────────────────────────────────────────────┘
+  activated:
+    title: "&a&l✔ ¡PROTECCIÓN ACTIVADA!"
+    subtitle: "&7Tipo: &b{tipo} &8| &7Radio: &e{radio} bloques"
+    
+    chat: |
+      &8╔════════════════════════════════════════════════════════╗
+      &8║         &a&l✔ PROTECCIÓN ACTIVADA EXITOSAMENTE &8║
+      &8╠════════════════════════════════════════════════════════╣
+      &8║  &7Tipo: &b{tipo}
+      &8║  &7Radio: &e{radio} bloques
+      &8║  &7Ubicación: &f{x}, {y}, {z}
+      &8║  &7Mundo: &d{world}
+      &8║
+      &8║  &7→ Click derecho en el bloque para gestionar
+      &8║  &7→ Romper el bloque &c&lELIMINA&7 la protección
+      &8╚════════════════════════════════════════════════════════╝
+  
+  # ┌─────────────────────────────────────────────────────────────┐
+  # │ ELIMINACIÓN DE PROTECCIÓN                                    │
+  # └─────────────────────────────────────────────────────────────┘
+  removed:
+    title: "&c&l✖ PROTECCIÓN ELIMINADA"
+    subtitle: "&7La protección ha sido destruida"
+    
+    chat: |
+      &c&l✖ &cProtección &f{tipo}&c eliminada.
+      &7El bloque de protección fue destruido.
+  
+  # ┌─────────────────────────────────────────────────────────────┐
+  # │ BLOQUEOS DE ACCIONES                                         │
+  # └─────────────────────────────────────────────────────────────┘
+  blocked:
+    # Bloqueo de romper bloques
+    break: |
+      &c&l⚠ ¡ZONA PROTEGIDA!
+      &7No puedes romper bloques en esta área.
+      &7Protección: &f{tipo}
+    
+    # Bloqueo de colocar bloques
+    place: |
+      &c&l⚠ ¡ZONA PROTEGIDA!
+      &7No puedes colocar bloques en esta área.
+      &7Protección: &f{tipo}
+    
+    # Bloqueo de interacción
+    interact: |
+      &c&l⚠ ¡ZONA PROTEGIDA!
+      &7No puedes interactuar con objetos aquí.
+      &7Protección: &f{tipo}
+    
+    # Bloqueo de PvP
+    pvp: |
+      &c&l⚠ ¡PVP DESACTIVADO!
+      &7No puedes atacar jugadores en esta zona.
+    
+    # Bloqueo de explosiones
+    explosion: |
+      &c&l⚠ ¡EXPLOSIONES BLOQUEADAS!
+      &7Las explosiones están deshabilitadas en esta zona.
+    
+    # Bloqueo de entrada
+    entry: |
+      &4&l╔════════════════════════════════════════════════════╗
+      &4&l║                                                    ║
+      &4&l║          ⚠  ZONA TOTALMENTE RESTRINGIDA  ⚠        ║
+      &4&l║                                                    ║
+      &4&l║              ACCESO COMPLETAMENTE                  ║
+      &4&l║                   DENEGADO                         ║
+      &4&l║                                                    ║
+      &4&l║         No tienes permiso para entrar aquí         ║
+      &4&l║                                                    ║
+      &4&l╚════════════════════════════════════════════════════╝
+    
+    # Bloqueo de spawn
+    spawn: "&c&l⚠ &cEl spawn de mobs está bloqueado en esta zona."
+    
+    # Bloqueo de fuego
+    fire: "&c&l⚠ &cLa propagación de fuego está bloqueada en esta zona."
+    
+    # Bloqueo de redstone
+    redstone: "&c&l⚠ &cLos circuitos de redstone están desactivados aquí."
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 👥 SISTEMA DE MIEMBROS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+members:
+  
+  # Añadir miembro
+  added: |
+    &a&l✔ &aMiembro añadido exitosamente!
+    &7▪ &fJugador: &b{player}
+    &7▪ &fRol: {role_colored}
+    &7▪ &fProtección: &d{protection_id}
+  
+  # Remover miembro
+  removed: |
+    &c&l✖ &cMiembro removido.
+    &7▪ &fJugador: &b{player}
+    &7▪ &fProtección: &d{protection_id}
+  
+  # Cambiar rol
+  role-changed: |
+    &e&l⟳ &eRol actualizado.
+    &7▪ &fJugador: &b{player}
+    &7▪ &fNuevo rol: {role_colored}
+  
+  # Errores
+  already-member: "&c&l✖ &c{player}&7 ya es miembro de esta protección."
+  not-member: "&c&l✖ &c{player}&7 no es miembro de esta protección."
+  cannot-remove-owner: "&c&l✖ &cNo puedes remover al dueño de la protección."
+  no-permission-manage: "&c&l✖ &cNo tienes permiso para gestionar miembros."
+  
+  # Roles con colores
+  roles:
+    owner: "&6&lDUEÑO"
+    moderator: "&b&lMODERADOR"
+    member: "&a&lMIEMBRO"
+    visitor: "&7&lVISITANTE"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🏷️ SISTEMA DE FLAGS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+flags:
+  
+  # Flag activado
+  enabled: |
+    &a&l✔ &aFlag activado: &f{flag}
+    &7Estado: &aACTIVO
+  
+  # Flag desactivado
+  disabled: |
+    &c&l✖ &cFlag desactivado: &f{flag}
+    &7Estado: &cINACTIVO
+  
+  # Lista de flags
+  list:
+    header: |
+      &8╔════════════════════════════════════════════════════════╗
+      &8║          &b&l⚑ FLAGS DE PROTECCIÓN &8║
+      &8╠════════════════════════════════════════════════════════╣
+    
+    entry-enabled: "&8║  &a✔ &f{flag} &8- &aActivado"
+    entry-disabled: "&8║  &c✖ &f{flag} &8- &cDesactivado"
+    
+    footer: "&8╚════════════════════════════════════════════════════════╝"
+  
+  # Nombres de flags
+  names:
+    block-break: "Romper Bloques"
+    block-place: "Colocar Bloques"
+    interact: "Interacciones"
+    pvp: "Combate PvP"
+    explosions: "Explosiones"
+    fire: "Propagación de Fuego"
+    mob-spawning: "Spawn de Mobs"
+    damage: "Daño a Entidades"
+    interact-entity: "Interacción con Entidades"
+    item-drop: "Soltar Ítems"
+    item-pickup: "Recoger Ítems"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🛒 SISTEMA DE TIENDA
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+shop:
+  
+  # Apertura de tienda
+  opened: "&a&l✔ &aTienda de protecciones abierta."
+  
+  # Compra exitosa
+  purchase-success: |
+    &a&l✔ ¡Compra exitosa!
+    &7▪ &fÍtem: &b{item}
+    &7▪ &fPrecio: &e${price}
+    &7▪ &fSaldo restante: &e${balance}
+  
+  # Añadir a tienda
+  add-success: |
+    &a&l✔ &aÍtem añadido a la tienda!
+    &7▪ &fPrecio: &e${price}
+    &7▪ &fNombre: &b{name}
+  
+  # Errores
+  empty: |
+    &c&l✖ &cLa tienda está vacía.
+    &7No hay protecciones disponibles para comprar.
+  
+  insufficient-funds: |
+    &c&l✖ &cDinero insuficiente!
+    &7▪ &fPrecio: &e${price}
+    &7▪ &fTu saldo: &c${balance}
+    &7▪ &fFaltan: &c${needed}
+  
+  no-space: "&c&l✖ &cNo tienes espacio en el inventario."
+  
+  not-holding-item: "&c&l✖ &cDebes tener un ítem en la mano."
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 📊 INTERFAZ GRÁFICA (GUI)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+gui:
+  
+  # Títulos de GUIs
+  titles:
+    main: "&8⛏ &b&lPROTECTIUM &8— &7Menú Principal"
+    list: "&8⛏ &b&lPROTECTIUM &8— &7Protecciones Activas"
+    types: "&8⛏ &b&lPROTECTIUM &8— &7Tipos de Protección"
+    info: "&8⛏ &b&lPROTECTIUM &8— &7Info: {player}"
+    members: "&8⛏ &b&lPROTECTIUM &8— &7Miembros"
+    flags: "&8⛏ &b&lPROTECTIUM &8— &7Configurar Flags"
+    shop: "&8⛏ &b&lPROTECTIUM &8— &7Tienda"
+  
+  # Botones comunes
+  buttons:
+    back: "&7← Volver"
+    close: "&c✖ Cerrar"
+    next-page: "&aNext Página →"
+    previous-page: "&a← Página Anterior"
+    confirm: "&a&l✔ CONFIRMAR"
+    cancel: "&c&l✖ CANCELAR"
+  
+  # Descripciones de ítems
+  items:
+    protection:
+      name: "&b⬡ Protección #{id}"
+      lore:
+        - "&8├─────────────────────────────┤"
+        - "&8│ &7Tipo: {tipo}"
+        - "&8│ &7Radio: &e{radio} bloques"
+        - "&8│ &7Dueño: &a{owner}"
+        - "&8│ &7Ubicación: &f{location}"
+        - "&8│ &7Miembros: &b{members}"
+        - "&8│"
+        - "&8│ &eClick para gestionar"
+        - "&8└─────────────────────────────┘"
+    
+    no-protections:
+      name: "&7&o(Sin protecciones)"
+      lore:
+        - "&8├─────────────────────────────┤"
+        - "&8│ &7No hay protecciones activas"
+        - "&8│ &7en este momento."
+        - "&8└─────────────────────────────┘"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 🔧 SISTEMA DE CONSISTENCIA
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+system:
+  
+  # Tarea de consistencia
+  consistency:
+    orphan-removed: |
+      &e&l⚠ &eProtección huérfana eliminada.
+      &7Ubicación: &f{location}
+      &7(El bloque ya no existía)
+    
+    check-complete: |
+      &a&l✔ &aChequeo de consistencia completado.
+      &7▪ &fProtecciones verificadas: &b{checked}
+      &7▪ &fHuérfanas eliminadas: &c{removed}
+      &7▪ &fDuración: &e{duration}ms
+  
+  # Guardado automático
+  autosave:
+    starting: "&e&l⟳ &eGuardando protecciones..."
+    success: "&a&l✔ &a{count} protección(es) guardadas."
+    error: "&c&l✖ &4ERROR al guardar protecciones: &f{error}"
+  
+  # Carga de datos
+  loading:
+    starting: "&e&l⟳ &eCargando protecciones desde disco..."
+    success: "&a&l✔ &a{count} protección(es) cargadas."
+    error: "&c&l✖ &4ERROR al cargar protecciones: &f{error}"
+  
+  # Inicio del plugin
+  startup:
+    banner: |
+      &8╔════════════════════════════════════════════════════════╗
+      &8║                                                        ║
+      &8║            &b&l⚔ PROTECTIUM v{version} ⚔&8              ║
+      &8║                &7Sistema de Protecciones               ║
+      &8║                                                        ║
+      &8║  &aEstado: &2●&a ONLINE                                  ║
+      &8║  &7Servidor: &fPaper {paper_version}+                  ║
+      &8║                                                        ║
+      &8╚════════════════════════════════════════════════════════╝
+  
+  # Apagado del plugin
+  shutdown:
+    message: |
+      &e&l⚠ &eProtectium desactivándose...
+      &7Guardando protecciones y limpiando recursos...
+    success: "&a&l✔ &aProtectium desactivado exitosamente."
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# 📝 DESCRIPCIONES DE ÍTEMS DE PROTECCIÓN
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+items:
+  
+  # Ítem de protección de ÁREA
+  area:
+    name: "&b&l⬡ Área Protegida"
+    lore:
+      - "&8├─────────────────────────────┤"
+      - "&8│ &7Tipo: &bÁrea Protegida"
+      - "&8│ &7Radio: &e{radio} bloques"
+      - "&8│"
+      - "&8│ &7Este ítem &cNO&7 hace nada"
+      - "&8│ &7mientras esté en tu inventario."
+      - "&8│"
+      - "&8│ &a&lCOLÓCALO&7 en el mundo para"
+      - "&8│ &aactivar la protección cúbica."
+      - "&8│"
+      - "&8│ &c&lROMPER&7 el bloque elimina"
+      - "&8│ &cla protección permanentemente."
+      - "&8│"
+      - "&8│ &7Bloquea:"
+      - "&8│  &8• &7Romper bloques"
+      - "&8│  &8• &7Colocar bloques"
+      - "&8│  &8• &7Fuego y explosiones"
+      - "&8└─────────────────────────────┘"
+  
+  # Ítem de protección ANTI-SPAWN
+  spawn:
+    name: "&d&l⬡ Zona Anti-Spawn"
+    lore:
+      - "&8├─────────────────────────────┤"
+      - "&8│ &7Tipo: &dAnti-Spawn"
+      - "&8│ &7Radio: &e{radio} bloques"
+      - "&8│"
+      - "&8│ &7Este ítem &cNO&7 hace nada"
+      - "&8│ &7mientras esté en tu inventario."
+      - "&8│"
+      - "&8│ &a&lCOLÓCALO&7 en el mundo para"
+      - "&8│ &aactivar la protección cúbica."
+      - "&8│"
+      - "&8│ &c&lROMPER&7 el bloque elimina"
+      - "&8│ &cla protección permanentemente."
+      - "&8│"
+      - "&8│ &7Previene:"
+      - "&8│  &8• &7Spawn de mobs hostiles"
+      - "&8│  &8• &7Spawn natural de enemigos"
+      - "&8└─────────────────────────────┘"
+  
+  # Ítem de protección ENTRADA RESTRINGIDA
+  entrada:
+    name: "&c&l⬡ Entrada Restringida"
+    lore:
+      - "&8├─────────────────────────────┤"
+      - "&8│ &7Tipo: &cEntrada Restringida"
+      - "&8│ &7Radio: &e{radio} bloques"
+      - "&8│"
+      - "&8│ &7Este ítem &cNO&7 hace nada"
+      - "&8│ &7mientras esté en tu inventario."
+      - "&8│"
+      - "&8│ &a&lCOLÓCALO&7 en el mundo para"
+      - "&8│ &aactivar la protección cúbica."
+      - "&8│"
+      - "&8│ &c&lROMPER&7 el bloque elimina"
+      - "&8│ &cla protección permanentemente."
+      - "&8│"
+      - "&8│ &7Bloquea:"
+      - "&8│  &8• &7Entrada de jugadores"
+      - "&8│  &8• &7Teletransportación al área"
+      - "&8└─────────────────────────────┘"
+  
+  # Ítem de protección ANTI-FUEGO
+  fuego:
+    name: "&6&l⬡ Zona Anti-Fuego"
+    lore:
+      - "&8├─────────────────────────────┤"
+      - "&8│ &7Tipo: &6Anti-Fuego"
+      - "&8│ &7Radio: &e{radio} bloques"
+      - "&8│"
+      - "&8│ &7Este ítem &cNO&7 hace nada"
+      - "&8│ &7mientras esté en tu inventario."
+      - "&8│"
+      - "&8│ &a&lCOLÓCALO&7 en el mundo para"
+      - "&8│ &aactivar la protección cúbica."
+      - "&8│"
+      - "&8│ &c&lROMPER&7 el bloque elimina"
+      - "&8│ &cla protección permanentemente."
+      - "&8│"
+      - "&8│ &7Bloquea:"
+      - "&8│  &8• &7Propagación de fuego"
+      - "&8│  &8• &7Flujo de lava"
+      - "&8│  &8• &7Encender fuego"
+      - "&8└─────────────────────────────┘"
+  
+  # Ítem de protección ANTI-REDSTONE
+  redstone:
+    name: "&5&l⬡ Zona Anti-Redstone"
+    lore:
+      - "&8├─────────────────────────────┤"
+      - "&8│ &7Tipo: &5Anti-Redstone"
+      - "&8│ &7Radio: &e{radio} bloques"
+      - "&8│"
+      - "&8│ &7Este ítem &cNO&7 hace nada"
+      - "&8│ &7mientras esté en tu inventario."
+      - "&8│"
+      - "&8│ &a&lCOLÓCALO&7 en el mundo para"
+      - "&8│ &aactivar la protección cúbica."
+      - "&8│"
+      - "&8│ &c&lROMPER&7 el bloque elimina"
+      - "&8│ &cla protección permanentemente."
+      - "&8│"
+      - "&8│ &7Deshabilita:"
+      - "&8│  &8• &7Circuitos de redstone"
+      - "&8│  &8• &7Activación de mecanismos"
+      - "&8└─────────────────────────────┘"
+  
+  # Ítem personalizado
+  custom:
+    name: "&b&l{custom_name}"
+    lore:
+      - "&8├─────────────────────────────┤"
+      - "&8│ &7Nombre: &b{custom_name}"
+      - "&8│ &7Radio: &e{radio} bloques"
+      - "&8│"
+      - "&8│ &aColoca el bloque para"
+      - "&8│ &aactivar la protección."
+      - "&8│"
+      - "&8│ &cRomper = elimina protección"
+      - "&8└─────────────────────────────┘"

@@ -1,5 +1,6 @@
 package com.protectium.item;
 
+import com.protectium.core.MessageManager;
 import com.protectium.protection.ProtectionType;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -7,6 +8,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+
+import java.util.List;
 
 /**
  * Única autoridad sobre los ítems de protección.
@@ -17,6 +20,8 @@ import org.bukkit.plugin.Plugin;
  *
  * Diseño: NUNCA se genera un ítem de protección desde otro lugar.
  * Todo pasa por aquí. Si no tiene el watermark NBT correcto, no existe.
+ * 
+ * VERSIÓN MEJORADA: Usa MessageManager para textos personalizables
  */
 public final class ItemAuthority {
 
@@ -30,6 +35,7 @@ public final class ItemAuthority {
     private static final Material MATERIAL_BASE = Material.AMETHYST_BLOCK;
 
     private final Plugin plugin;
+    private final MessageManager messageManager;
 
     public ItemAuthority(Plugin plugin) {
         this.plugin = plugin;
@@ -37,6 +43,9 @@ public final class ItemAuthority {
         this.keyRadio = new NamespacedKey(plugin, "radio");
         this.keyToken = new NamespacedKey(plugin, "token");
         this.keyNombre = new NamespacedKey(plugin, "nombre");
+        
+        // Obtener MessageManager
+        this.messageManager = ((com.protectium.core.ProtectiumPlugin) plugin).getMessageManager();
     }
 
     // ---------------------------------------------------------------
@@ -52,30 +61,16 @@ public final class ItemAuthority {
         ItemStack item = new ItemStack(MATERIAL_BASE);
         item.setAmount(1);
 
-        // --- Nombre y lore visual ---
         var meta = item.getItemMeta();
         if (meta == null)
-            return item; // nunca debería pasar con AMETHYST_BLOCK
+            return item;
 
-        String nombreTipo = getNombreTipo(tipo);
-        meta.setDisplayName(nombreTipo);
+        // Nombre y lore desde messages.yml
+        String tipoKey = tipo.getConfigKey();
+        meta.setDisplayName(messageManager.getItemName(tipoKey));
+        meta.setLore(messageManager.getItemLore(tipoKey, radio));
 
-        meta.setLore(java.util.List.of(
-                "§8├─────────────────────────────┤",
-                "§8│ §7Tipo:  " + nombreTipo,
-                "§8│ §7Radio: §b" + radio + " bloques",
-                "§8│",
-                "§8│ §7Este ítem NO hace nada",
-                "§8│ §7mientras esté en tu inventario.",
-                "§8│",
-                "§8│ §aColéca lo en el mundo para",
-                "§8│ §aactivar la protección cúbica.",
-                "§8│",
-                "§8│ §cRomper el bloque elimina",
-                "§8│ §cla protección permanentemente.",
-                "§8└─────────────────────────────┘"));
-
-        // Que no se pueda combinar ni stackear
+        // Unbreakable para que no se pueda combinar ni stackear
         meta.setUnbreakable(true);
 
         // --- Marca NBT (watermark) ---
@@ -100,18 +95,7 @@ public final class ItemAuthority {
             return item;
 
         meta.setDisplayName("§b§l" + nombre);
-
-        meta.setLore(java.util.List.of(
-                "§8├─────────────────────────────┤",
-                "§8│ §7Nombre: §b" + nombre,
-                "§8│ §7Radio:  §e" + radio + " bloques",
-                "§8│",
-                "§8│ §aColoca el bloque para",
-                "§8│ §aactivar la proteccion.",
-                "§8│",
-                "§8│ §cRomper = elimina proteccion",
-                "§8└─────────────────────────────┘"));
-
+        meta.setLore(messageManager.getCustomItemLore(nombre, radio));
         meta.setUnbreakable(true);
 
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
@@ -136,24 +120,7 @@ public final class ItemAuthority {
             return item;
 
         meta.setDisplayName("§b§l" + nombre);
-
-        meta.setLore(java.util.List.of(
-                "§8├─────────────────────────────┤",
-                "§8│ §7Nombre: §b" + nombre,
-                "§8│ §7Radio:  §e" + radio + " bloques",
-                "§8│",
-                "§8│ §aColoca el bloque para",
-                "§8│ §aactivar la proteccion.",
-                "§8│",
-                "§8│ §cRomper = elimina proteccion",
-                "§8└─────────────────────────────┘"));
-
-        // No hacemos setUnbreakable(true) forzosamente para bloques normales,
-        // pero para protecciones queda bien para distinguirlos.
-        // Opcional: si es visualmente molesto, quitarlo.
-        // Lo dejaremos para que brille un poco o se vea 'especial' si el cliente lo
-        // renderiza así,
-        // aunque bloques normales no suelen mostrar el brillo de encantamiento igual.
+        meta.setLore(messageManager.getCustomItemLore(nombre, radio));
 
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
         pdc.set(keyTipo, PersistentDataType.STRING, tipo.getConfigKey());
