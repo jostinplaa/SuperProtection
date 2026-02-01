@@ -55,9 +55,9 @@ public final class ProtectiumPlugin extends JavaPlugin {
 
     private void inicializarComponentes() {
         this.registry = new ProtectionRegistry();
-        this.itemAuthority = new ItemAuthority(this);
         this.mensajes = new Mensajes(getConfig());
         this.messageManager = new MessageManager(this);
+        this.itemAuthority = new ItemAuthority(this);
         this.fxEngine = new FxEngine(getConfig());
         this.fxEngine.setPlugin(this);
         this.guiManager = new GuiManager(registry, mensajes);
@@ -142,13 +142,13 @@ public final class ProtectiumPlugin extends JavaPlugin {
     private void iniciarTareas() {
         // FxTickTask - Solo UNA tarea asíncrona optimizada
         new FxTickTask(fxEngine, registry).runTaskTimerAsynchronously(this, 1L, 1L);
-        
+
         // Tarea de consistencia cada 60 segundos
         new ConsistencyTask(registry, itemAuthority, this).runTaskTimer(this, 1200L, 1200L);
-        
+
         // BossBar task cada 0.5 segundos
         new com.protectium.task.BossBarTask(registry).runTaskTimer(this, 10L, 10L);
-        
+
         // Auto-guardado cada 5 minutos (6000 ticks) con manejo de errores
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
             @Override
