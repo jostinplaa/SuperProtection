@@ -40,6 +40,14 @@ public final class ProtectiumPlugin extends JavaPlugin {
         registrarComandos();
         registrarListeners();
         iniciarTareas();
+
+        // Inicializar integración con Vault (economía)
+        if (VaultHook.setup()) {
+            getLogger().info("Vault detectado - Economía habilitada para la tienda.");
+        } else {
+            getLogger().warning("Vault no encontrado - La tienda funcionará sin economía.");
+        }
+
         getLogger().info("Protectium cargado exitosamente!");
     }
 

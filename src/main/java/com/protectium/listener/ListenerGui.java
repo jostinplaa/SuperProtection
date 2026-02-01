@@ -48,7 +48,8 @@ public final class ListenerGui implements Listener {
     public void onClick(InventoryClickEvent event) {
         Inventory inv = event.getInventory();
 
-        if (!(inv.getHolder() instanceof GuiHolder)) return;
+        if (!(inv.getHolder() instanceof GuiHolder))
+            return;
         GuiHolder holder = (GuiHolder) inv.getHolder();
 
         event.setCancelled(true);
@@ -56,25 +57,29 @@ public final class ListenerGui implements Listener {
         Player jugador = (Player) event.getWhoClicked();
         int slot = event.getRawSlot();
 
-        if (slot < 0 || slot >= inv.getSize()) return;
+        if (slot < 0 || slot >= inv.getSize())
+            return;
 
         GuiManager.GuiContext ctx = guiManager.getContexto(jugador.getUniqueId());
 
         switch (holder.getTipo()) {
-            case PRINCIPAL        -> handlePrincipal(jugador, slot);
-            case LISTA            -> handleLista(jugador, slot, ctx);
-            case TIPOS            -> { }
-            case DETALLE          -> handleDetalle(jugador, slot, holder);
-            case MENU_PROTECCION  -> handleMenuProteccion(jugador, slot, ctx);
-            case FLAGS            -> handleFlags(jugador, slot, ctx);
-            case MIEMBROS         -> handleMiembros(jugador, slot, ctx, event);
-            case TIENDA           -> handleTienda(jugador, slot, event.getCurrentItem());
-            default               -> { }
+            case PRINCIPAL -> handlePrincipal(jugador, slot);
+            case LISTA -> handleLista(jugador, slot, ctx);
+            case TIPOS -> {
+            }
+            case DETALLE -> handleDetalle(jugador, slot, holder);
+            case MENU_PROTECCION -> handleMenuProteccion(jugador, slot, ctx);
+            case FLAGS -> handleFlags(jugador, slot, ctx);
+            case MIEMBROS -> handleMiembros(jugador, slot, ctx, event);
+            case TIENDA -> handleTienda(jugador, slot, event.getCurrentItem());
+            default -> {
+            }
         }
     }
 
     @EventHandler
-    public void onClose(InventoryCloseEvent event) { }
+    public void onClose(InventoryCloseEvent event) {
+    }
 
     // ---------------------------------------------------------------
 
@@ -104,7 +109,8 @@ public final class ListenerGui implements Listener {
         if (slot >= 10 && slot <= 43) {
             int col = slot % 9;
             int fila = slot / 9;
-            if (col < 1 || col > 7 || fila < 1 || fila > 4) return;
+            if (col < 1 || col > 7 || fila < 1 || fila > 4)
+                return;
 
             List<ProtectionRecord> todas = registry.todas();
             int porPagina = 28;
@@ -120,7 +126,8 @@ public final class ListenerGui implements Listener {
 
     private void handleDetalle(Player jugador, int slot, GuiHolder holder) {
         ProtectionRecord rec = holder.getProteccionDetalle();
-        if (rec == null) return;
+        if (rec == null)
+            return;
 
         switch (slot) {
             case 20 -> {
@@ -135,7 +142,8 @@ public final class ListenerGui implements Listener {
     }
 
     private void handleMenuProteccion(Player jugador, int slot, GuiManager.GuiContext ctx) {
-        if (ctx == null || ctx.proteccion == null) return;
+        if (ctx == null || ctx.proteccion == null)
+            return;
         ProtectionRecord rec = ctx.proteccion;
 
         switch (slot) {
@@ -173,7 +181,8 @@ public final class ListenerGui implements Listener {
                                 ((com.protectium.core.ProtectiumPlugin) org.bukkit.plugin.java.JavaPlugin
                                         .getProvidingPlugin(ListenerGui.class))
                                         .getPersistenceManager().saveAll();
-                            } catch (Exception ignored) { }
+                            } catch (Exception ignored) {
+                            }
                         });
             }
             case 44 -> jugador.closeInventory();
@@ -181,7 +190,8 @@ public final class ListenerGui implements Listener {
     }
 
     private void handleFlags(Player jugador, int slot, GuiManager.GuiContext ctx) {
-        if (ctx == null || ctx.proteccion == null) return;
+        if (ctx == null || ctx.proteccion == null)
+            return;
         ProtectionRecord rec = ctx.proteccion;
 
         if (!rec.canModify(jugador.getUniqueId()) && !jugador.hasPermission("protectium.bypass")) {
@@ -204,12 +214,14 @@ public final class ListenerGui implements Listener {
                 return;
             }
             currentSlot++;
-            if (currentSlot % 9 == 8) currentSlot += 2;
+            if (currentSlot % 9 == 8)
+                currentSlot += 2;
         }
     }
 
     private void handleMiembros(Player jugador, int slot, GuiManager.GuiContext ctx, InventoryClickEvent event) {
-        if (ctx == null || ctx.proteccion == null) return;
+        if (ctx == null || ctx.proteccion == null)
+            return;
         ProtectionRecord rec = ctx.proteccion;
 
         if (!rec.canModify(jugador.getUniqueId()) && !jugador.hasPermission("protectium.bypass")) {
@@ -241,14 +253,15 @@ public final class ListenerGui implements Listener {
                     return;
                 }
                 currentSlot++;
-                if (currentSlot % 9 == 8) currentSlot += 2;
+                if (currentSlot % 9 == 8)
+                    currentSlot += 2;
             }
         }
     }
 
     private void handleTienda(Player jugador, int slot, ItemStack item) {
-        com.protectium.shop.ShopManager shop = ((com.protectium.core.ProtectiumPlugin)
-                org.bukkit.plugin.java.JavaPlugin.getProvidingPlugin(ListenerGui.class)).getShopManager();
+        com.protectium.shop.ShopManager shop = ((com.protectium.core.ProtectiumPlugin) org.bukkit.plugin.java.JavaPlugin
+                .getProvidingPlugin(ListenerGui.class)).getShopManager();
         int totalPaginas = Math.max(1, (int) Math.ceil(shop.getItems().size() / 21.0));
 
         // Cerrar
@@ -271,11 +284,13 @@ public final class ListenerGui implements Listener {
         }
 
         // Click en un ítem de compra
-        if (item == null || !item.hasItemMeta()) return;
+        if (item == null || !item.hasItemMeta())
+            return;
 
         PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
         NamespacedKey key = new NamespacedKey("protectium", "shop_id");
-        if (!pdc.has(key, PersistentDataType.STRING)) return;
+        if (!pdc.has(key, PersistentDataType.STRING))
+            return;
 
         String shopId = pdc.get(key, PersistentDataType.STRING);
 
@@ -293,12 +308,40 @@ public final class ListenerGui implements Listener {
             return;
         }
 
+        // Verificar y descontar dinero via Vault
+        double precio = shopItem.getPrecio();
+        if (com.protectium.core.VaultHook.isEnabled()) {
+            if (!com.protectium.core.VaultHook.hasEnough(jugador, precio)) {
+                double saldo = com.protectium.core.VaultHook.getBalance(jugador);
+                double falta = precio - saldo;
+                jugador.sendMessage(mensajes.getPrefijoError() + "§c¡Dinero insuficiente!");
+                jugador.sendMessage("§7Precio: §e$" + precio);
+                jugador.sendMessage("§7Tu saldo: §c$" + saldo);
+                jugador.sendMessage("§7Te faltan: §c$" + falta);
+                return;
+            }
+            // Descontar dinero
+            if (!com.protectium.core.VaultHook.withdraw(jugador, precio)) {
+                jugador.sendMessage(mensajes.getPrefijoError() + "§cError al procesar el pago.");
+                return;
+            }
+        }
+
         // Dar ítem original limpio (sin lore de precio ni PDC de shop_id)
         jugador.getInventory().addItem(shopItem.getItem());
 
         String nombre = shopItem.getItem().getItemMeta() != null && shopItem.getItem().getItemMeta().hasDisplayName()
-                ? shopItem.getItem().getItemMeta().getDisplayName() : "Ítem";
-        jugador.sendMessage(mensajes.exitoCompraTienda(nombre, shopItem.getPrecio()));
+                ? shopItem.getItem().getItemMeta().getDisplayName()
+                : "Ítem";
+        double nuevoSaldo = com.protectium.core.VaultHook.isEnabled()
+                ? com.protectium.core.VaultHook.getBalance(jugador)
+                : 0;
+        jugador.sendMessage(mensajes.getPrefijoExito() + "§a¡Compra exitosa!");
+        jugador.sendMessage("§7Ítem: §b" + nombre);
+        jugador.sendMessage("§7Precio: §e$" + precio);
+        if (com.protectium.core.VaultHook.isEnabled()) {
+            jugador.sendMessage("§7Saldo restante: §e$" + nuevoSaldo);
+        }
         jugador.closeInventory();
     }
 }
