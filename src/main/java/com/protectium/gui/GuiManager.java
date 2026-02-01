@@ -16,14 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Gestor completo de GUIs del plugin.
- * Maneja todos los menús: principal, lista, flags, miembros, etc.
  */
 public final class GuiManager {
 
     private final ProtectionRegistry registry;
     private final Mensajes mensajes;
-
-    // Cache de contexto para GUIs abiertas
     private final Map<UUID, GuiContext> contextos = new ConcurrentHashMap<>();
 
     public GuiManager(ProtectionRegistry registry, Mensajes mensajes) {
@@ -31,9 +28,6 @@ public final class GuiManager {
         this.mensajes = mensajes;
     }
 
-    /**
-     * Contexto de GUI abierta para un jugador.
-     */
     public static class GuiContext {
         public GuiTipo tipo;
         public ProtectionRecord proteccion;
@@ -46,142 +40,217 @@ public final class GuiManager {
     }
 
     // ---------------------------------------------------------------
-    // GUI Tienda
+    // GUI Tienda — Diseño premium
+    // ---------------------------------------------------------------
+    //
+    // Layout (6 filas = 54 slots):
+    //
+    //  [0] PUR  PUR  PUR  PUR  [TITULO]  PUR  PUR  PUR  PUR
+    //  [1] NEG  ——   ——   ——   ——        ——   ——   ——   NEG
+    //  [2] NEG  item item item item      item item item NEG
+    //  [3] NEG  item item item item      item item item NEG
+    //  [4] NEG  item item item item      item item item NEG
+    //  [5] NEG  [◄]  NEG  NEG  [X cerrar] NEG  NEG [►]  NEG
+    //
     // ---------------------------------------------------------------
 
     public void abrirTienda(Player jugador, com.protectium.shop.ShopManager shop) {
-        // Forzar 6 filas para diseño premium
-        int filas = 6;
-        Inventory inv = Bukkit.createInventory(new GuiHolder(GuiTipo.TIENDA),
-                filas * 9, "§8🛒 §2§lTIENDA DE PROTECCIONES");
+        List<com.protectium.shop.ShopManager.ShopItem> items = shop.getItems();
+        int porPagina = 21; // 3 filas × 7 columnas
+        int totalPaginas = Math.max(1, (int) Math.ceil((double) items.size() / porPagina));
 
-        // Rellenar bordes con cristal gris
-        ItemStack borde = crearItem(Material.GRAY_STAINED_GLASS_PANE, "§8");
-        for (int i = 0; i < inv.getSize(); i++) {
-            if (i < 9 || i >= 45 || i % 9 == 0 || i % 9 == 8) {
-                inv.setItem(i, borde);
-            }
+        // Obtener página actual del contexto si existe
+        GuiContext ctxActual = contextos.get(jugador.getUniqueId());
+        int pagina = (ctxActual != null && ctxActual.tipo == GuiTipo.TIENDA) ? ctxActual.pagina : 0;
+        pagina = Math.max(0, Math.min(pagina, totalPaginas - 1));
+
+        abrirTiendaPagina(jugador, shop, pagina, totalPaginas);
+    }
+
+    public void abrirTiendaPagina(Player jugador, com.protectium.shop.ShopManager shop, int pagina, int totalPaginas) {
+        List<com.protectium.shop.ShopManager.ShopItem> items = shop.getItems();
+
+        Inventory inv = Bukkit.createInventory(new GuiHolder(GuiTipo.TIENDA), 54,
+                "§8⛏ §2§lTIENDA §8» §7Protecciones");
+
+        // ─── Fila 0: borde superior púrpura + título central ───
+        ItemStack bordePur = crearItem(Material.PURPLE_STAINED_GLASS_PANE, "§8");
+        for (int i = 0; i < 9; i++) inv.setItem(i, bordePur);
+
+        // Título central (slot 4)
+        inv.setItem(4, crearItemConLore(Material.AMETHYST_BLOCK,
+                "§d§l⬡ TIENDA DE PROTECCIONES",
+                List.of(
+                        "§8├──────────────────────┤",
+                        "§7 Compra protecciones",
+                        "§7 para proteger tus zonas.",
+                        "§8│",
+                        "§7 Página: §b" + (pagina + 1) + "§7/§b" + totalPaginas,
+                        "§7 Items disponibles: §b" + items.size(),
+                        "§8└──────────────────────┘")));
+
+        // ─── Filas 1-4: bordes laterales negros ───
+        ItemStack bordeNeg = crearItem(Material.BLACK_STAINED_GLASS_PANE, "§8");
+        for (int fila = 1; fila <= 4; fila++) {
+            inv.setItem(fila * 9, bordeNeg);      // columna 0
+            inv.setItem(fila * 9 + 8, bordeNeg);  // columna 8
         }
 
-        // Botón cerrar
-        inv.setItem(49, crearItemConLore(Material.BARRIER, "§c§lCerrar", List.of()));
+        // ─── Fila 5: borde inferior + botones ───
+        for (int i = 45; i < 54; i++) inv.setItem(i, bordeNeg);
 
-        java.util.List<com.protectium.shop.ShopManager.ShopItem> items = shop.getItems();
+        // Botón cerrar (centro inferior, slot 49)
+        inv.setItem(49, crearItemConLore(Material.BARRIER,
+                "§c§l✕ Cerrar",
+                List.of("§7Cierra la tienda.")));
 
-        // Rellenar items en el centro (slots 10-16, 19-25, etc.)
+        // Botones de navegación
+        if (pagina > 0) {
+            inv.setItem(46, crearItemConLore(Material.ARROW,
+                    "§c§l◄ Anterior",
+                    List.of("§7Página anterior")));
+        }
+        if (pagina < totalPaginas - 1) {
+            inv.setItem(52, crearItemConLore(Material.ARROW,
+                    "§a§l► Siguiente",
+                    List.of("§7Página siguiente")));
+        }
+
+        // ─── Items del shop en el grid interior ───
+        // Slots disponibles: filas 2-4, columnas 1-7
         int[] slotsDisponibles = {
-                10, 11, 12, 13, 14, 15, 16,
-                19, 20, 21, 22, 23, 24, 25,
-                28, 29, 30, 31, 32, 33, 34,
-                37, 38, 39, 40, 41, 42, 43
+                19, 20, 21, 22, 23, 24, 25,   // fila 2
+                28, 29, 30, 31, 32, 33, 34,   // fila 3
+                37, 38, 39, 40, 41, 42, 43    // fila 4
         };
 
-        for (int i = 0; i < items.size() && i < slotsDisponibles.length; i++) {
+        int inicio = pagina * 21;
+        int fin = Math.min(inicio + 21, items.size());
+
+        for (int i = inicio; i < fin; i++) {
             com.protectium.shop.ShopManager.ShopItem shopItem = items.get(i);
-            ItemStack display = shopItem.getItem().clone(); // Clone to safety
-            ItemMeta meta = display.getItemMeta();
-            if (meta != null) {
-                List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
-                lore.add("");
-                lore.add("§8────────────────");
-                lore.add("§7 Precio: §a$" + shopItem.getPrecio());
-                lore.add("");
-                lore.add("§e➤ Click para comprar");
-                meta.setLore(lore);
-                meta.getPersistentDataContainer().set(new NamespacedKey("protectium", "shop_id"),
-                        org.bukkit.persistence.PersistentDataType.STRING, shopItem.getId());
-                display.setItemMeta(meta);
-            }
-            inv.setItem(slotsDisponibles[i], display);
+            int slotIdx = i - inicio;
+            if (slotIdx >= slotsDisponibles.length) break;
+
+            inv.setItem(slotsDisponibles[slotIdx], crearItemTienda(shopItem));
         }
 
+        // Si hay slots vacíos en el grid, rellenar con cristal oscuro para looks
+        for (int i = (fin - inicio); i < slotsDisponibles.length; i++) {
+            inv.setItem(slotsDisponibles[i], crearItem(Material.DARK_OAK_PLANKS, "§8"));
+        }
+
+        // Fila 1 — separador decorativo (cristal gris oscuro)
+        ItemStack separa = crearItem(Material.GRAY_STAINED_GLASS_PANE, "§8");
+        for (int col = 1; col <= 7; col++) inv.setItem(9 + col, separa);
+
         jugador.openInventory(inv);
+
         GuiContext ctx = new GuiContext(GuiTipo.TIENDA);
+        ctx.pagina = pagina;
         contextos.put(jugador.getUniqueId(), ctx);
     }
 
-    // ---------------------------------------------------------------
-    // GUI Principal de una Protección — Click en bloque de protección
-    // ---------------------------------------------------------------
-
     /**
-     * Abre el menú de gestión de una protección específica.
+     * Crea el ItemStack de display para un item de la tienda.
+     * Diseño de "card": precio destacado en verde, borde visual en lore.
      */
+    private static ItemStack crearItemTienda(com.protectium.shop.ShopManager.ShopItem shopItem) {
+        ItemStack display = shopItem.getItem().clone();
+        ItemMeta meta = display.getItemMeta();
+        if (meta == null) return display;
+
+        // Precio formateado
+        String precio;
+        if (shopItem.getPrecio() == (long) shopItem.getPrecio()) {
+            precio = String.valueOf((long) shopItem.getPrecio());
+        } else {
+            precio = String.format("%.1f", shopItem.getPrecio());
+        }
+
+        List<String> lore = new ArrayList<>();
+        // Si tenía lore original, separarlo
+        if (meta.hasLore()) {
+            lore.addAll(meta.getLore());
+            lore.add("");
+        }
+
+        lore.add("§8├──────────────────┤");
+        lore.add("§7 Precio: §a§l$" + precio);
+        lore.add("§8└──────────────────┘");
+        lore.add("");
+        lore.add("§e✦ Click para comprar");
+
+        meta.setLore(lore);
+
+        // Marca NBT con el ID del shop para que el ListenerGui lo identifique
+        meta.getPersistentDataContainer().set(
+                new NamespacedKey("protectium", "shop_id"),
+                org.bukkit.persistence.PersistentDataType.STRING,
+                shopItem.getId());
+
+        display.setItemMeta(meta);
+        return display;
+    }
+
+    // ---------------------------------------------------------------
+    // GUI Menú de una protección específica
+    // ---------------------------------------------------------------
+
     public void abrirMenuProteccion(Player jugador, ProtectionRecord rec) {
-        int filas = 5;
         Inventory inv = Bukkit.createInventory(new GuiHolder(GuiTipo.MENU_PROTECCION),
-                filas * 9, "§b§l⬡ §8Gestión de Protección");
+                45, "§b§l⬡ §8Gestión de Protección");
 
-        // Fondo oscuro
+        // Fondo
         ItemStack fondo = crearItem(Material.GRAY_STAINED_GLASS_PANE, "§8");
-        for (int i = 0; i < inv.getSize(); i++)
-            inv.setItem(i, fondo);
+        for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, fondo);
 
-        // Bordes decorativos
+        // Bordes negros
         ItemStack borde = crearItem(Material.BLACK_STAINED_GLASS_PANE, "§8");
         for (int i = 0; i < 9; i++) {
             inv.setItem(i, borde);
-            inv.setItem(inv.getSize() - 9 + i, borde);
+            inv.setItem(36 + i, borde);
         }
-        for (int i = 0; i < filas; i++) {
-            inv.setItem(i * 9, borde);
-            inv.setItem(i * 9 + 8, borde);
+        for (int fila = 0; fila < 5; fila++) {
+            inv.setItem(fila * 9, borde);
+            inv.setItem(fila * 9 + 8, borde);
         }
 
         Location loc = rec.getUbicacionBloque();
 
-        // --- Información de la protección (centro superior) ---
+        // Info central (slot 4)
         inv.setItem(4, crearItemConLore(
                 getMaterialPorTipo(rec.getTipo()),
                 getNombreTipo(rec.getTipo()),
                 List.of(
                         "§8├─────────────────────────┤",
-                        "§7 Radio: §b" + rec.getRadio() + " bloques",
+                        "§7 Radio:     §b" + rec.getRadio() + " bloques",
                         "§7 Ubicación: §b" + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ(),
-                        "§7 Mundo: §b" + loc.getWorld().getName(),
-                        "§7 Miembros: §b" + rec.getMembers().size(),
+                        "§7 Mundo:     §b" + loc.getWorld().getName(),
+                        "§7 Miembros:  §b" + rec.getMembers().size(),
                         "§8└─────────────────────────┘")));
 
-        // --- Botón: Configurar Flags ---
-        inv.setItem(20, crearItemConLore(
-                Material.REDSTONE_TORCH,
+        // Botones de acción (fila 2, centrados)
+        inv.setItem(20, crearItemConLore(Material.REDSTONE_TORCH,
                 "§e§l⚙ Configurar Flags",
-                List.of(
-                        "§7Configura los permisos de la zona.",
-                        "",
-                        "§8▶ §fClick para abrir")));
+                List.of("§7Configura los permisos de la zona.", "", "§8▶ §fClick para abrir")));
 
-        // --- Botón: Gestionar Miembros ---
-        inv.setItem(22, crearItemConLore(
-                Material.PLAYER_HEAD,
+        inv.setItem(22, crearItemConLore(Material.PLAYER_HEAD,
                 "§3§l👥 Miembros",
-                List.of(
-                        "§7Gestiona quién puede entrar o editar.",
-                        "",
-                        "§8▶ §fClick para abrir")));
+                List.of("§7Gestiona quién puede entrar o editar.", "", "§8▶ §fClick para abrir")));
 
-        // --- Botón: Teletransportarse ---
-        inv.setItem(24, crearItemConLore(
-                Material.ENDER_PEARL,
+        inv.setItem(24, crearItemConLore(Material.ENDER_PEARL,
                 "§d§l⚛ Teletransportarse",
-                List.of(
-                        "§7Viaja al centro de la protección.",
-                        "",
-                        "§8▶ §fClick para viajar")));
+                List.of("§7Viaja al centro de la protección.", "", "§8▶ §fClick para viajar")));
 
-        // --- Botón: Eliminar ---
-        inv.setItem(40, crearItemConLore(
-                Material.TNT,
-                "§c§l✖ ELIMINAR PROTECCIÓN",
-                List.of(
-                        "§7Borra esta protección permanentemente.",
-                        "§c¡No se puede deshacer!",
-                        "",
-                        "§8▶ §fClick para eliminar")));
+        // Eliminar (abajo izquierda, slot 40)
+        inv.setItem(40, crearItemConLore(Material.TNT,
+                "§c§l✖ ELIMINAR",
+                List.of("§7Borra esta protección permanentemente.",
+                        "§c¡No se puede deshacer!", "", "§8▶ §fClick para eliminar")));
 
-        // --- Botón: Cerrar ---
-        inv.setItem(44, crearItemConLore(
-                Material.BARRIER,
+        // Cerrar (abajo derecha, slot 44)
+        inv.setItem(44, crearItemConLore(Material.BARRIER,
                 "§c§l✕ Cerrar",
                 List.of("§7Cierra este menú.")));
 
@@ -193,57 +262,54 @@ public final class GuiManager {
     }
 
     // ---------------------------------------------------------------
-    // GUI de Flags
+    // GUI Flags
     // ---------------------------------------------------------------
 
     public void abrirMenuFlags(Player jugador, ProtectionRecord rec) {
-        int filas = 4;
         Inventory inv = Bukkit.createInventory(new GuiHolder(GuiTipo.FLAGS),
-                filas * 9, "§e§l⚙ §8Configurar Flags");
+                36, "§e§l⚙ §8Configurar Flags");
 
         ItemStack fondo = crearItem(Material.GRAY_STAINED_GLASS_PANE, "§8");
-        for (int i = 0; i < inv.getSize(); i++)
-            inv.setItem(i, fondo);
+        for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, fondo);
 
-        // Definir flags con iconos
         Object[][] flagDefs = {
-                { "block-break", Material.IRON_PICKAXE, "Romper Bloques", "Permite romper bloques." },
-                { "block-place", Material.GRASS_BLOCK, "Colocar Bloques", "Permite colocar bloques." },
-                { "interact", Material.LEVER, "Interactuar", "Permite usar puertas, cofres, etc." },
-                { "pvp", Material.DIAMOND_SWORD, "PVP", "Permite combate entre jugadores." },
-                { "explosions", Material.TNT, "Explosiones", "Permite daño por explosiones." },
-                { "fire", Material.FLINT_AND_STEEL, "Fuego", "Permite propagación de fuego." },
-                { "mob-spawning", Material.SPAWNER, "Spawn de Mobs", "Permite aparición de mobs." },
-                { "damage", Material.IRON_SWORD, "Daño a Entidades", "Permite dañar animales/mobs." },
-                { "interact-entity", Material.VILLAGER_SPAWN_EGG, "Interactuar Entidades",
-                        "Permite interactuar con aldeanos/mobs." },
-                { "item-drop", Material.DROPPER, "Soltar Items", "Permite soltar items." },
-                { "item-pickup", Material.HOPPER, "Recoger Items", "Permite recoger items." }
+                { "block-break",      Material.IRON_PICKAXE,          "Romper Bloques",      "Permite romper bloques." },
+                { "block-place",      Material.GRASS_BLOCK,           "Colocar Bloques",     "Permite colocar bloques." },
+                { "interact",         Material.LEVER,                 "Interactuar",         "Permite usar puertas, cofres, etc." },
+                { "pvp",              Material.DIAMOND_SWORD,         "PVP",                 "Permite combate entre jugadores." },
+                { "explosions",       Material.TNT,                   "Explosiones",         "Permite daño por explosiones." },
+                { "fire",             Material.FLINT_AND_STEEL,       "Fuego",               "Permite propagación de fuego." },
+                { "mob-spawning",     Material.SPAWNER,               "Spawn de Mobs",       "Permite aparición de mobs." },
+                { "damage",           Material.IRON_SWORD,            "Daño Entidades",      "Permite dañar animales/mobs." },
+                { "interact-entity", Material.VILLAGER_SPAWN_EGG,    "Interactuar Ent.",    "Permite interactuar con aldeanos." },
+                { "item-drop",        Material.DROPPER,               "Soltar Items",        "Permite soltar items." },
+                { "item-pickup",      Material.HOPPER,                "Recoger Items",       "Permite recoger items." }
         };
 
         int slot = 10;
         for (Object[] def : flagDefs) {
-            String key = (String) def[0];
-            Material mat = (Material) def[1];
+            String key    = (String) def[0];
+            Material mat  = (Material) def[1];
             String nombre = (String) def[2];
-            String desc = (String) def[3];
+            String desc   = (String) def[3];
 
             boolean valor = rec.getFlag(key, false);
 
-            inv.setItem(slot, crearItemConLore(
-                    mat,
+            // Color según estado: verde si permitido, rojo si denegado
+            Material iconMat = valor ? Material.LIME_STAINED_GLASS_PANE : Material.RED_STAINED_GLASS_PANE;
+
+            inv.setItem(slot, crearItemConLore(mat,
                     (valor ? "§a" : "§c") + "§l" + nombre,
                     List.of(
                             "§7" + desc,
                             "",
-                            "§7Estado: " + (valor ? "§aPermitido" : "§cDenegado"),
+                            "§7Estado: " + (valor ? "§a✔ Permitido" : "§c✖ Denegado"),
+                            "",
                             "§8▶ §fClick para cambiar")));
 
             slot++;
-            if (slot % 9 == 8)
-                slot += 2; // Saltar bordes
-            if (slot > 25)
-                break;
+            if (slot % 9 == 8) slot += 2; // saltar bordes
+            if (slot > 25) break;
         }
 
         // Botón volver
@@ -258,23 +324,19 @@ public final class GuiManager {
     }
 
     // ---------------------------------------------------------------
-    // GUI de Miembros
+    // GUI Miembros
     // ---------------------------------------------------------------
 
     public void abrirMenuMiembros(Player jugador, ProtectionRecord rec) {
-        int filas = 5;
         Inventory inv = Bukkit.createInventory(new GuiHolder(GuiTipo.MIEMBROS),
-                filas * 9, "§a§l♦ §8Gestionar Miembros");
+                45, "§a§l♦ §8Gestionar Miembros");
 
         ItemStack fondo = crearItem(Material.GRAY_STAINED_GLASS_PANE, "§8");
-        for (int i = 0; i < inv.getSize(); i++)
-            inv.setItem(i, fondo);
+        for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, fondo);
 
-        // Encabezado
         inv.setItem(4, crearItemConLore(Material.PLAYER_HEAD, "§a§lMiembros",
                 List.of("§7Total: §a" + rec.getMembers().size())));
 
-        // Listar miembros
         Map<UUID, ProtectionRecord.MemberRole> miembros = rec.getMembers();
         int slot = 10;
 
@@ -283,8 +345,7 @@ public final class GuiManager {
             ProtectionRecord.MemberRole role = entry.getValue();
 
             String nombre = Bukkit.getOfflinePlayer(uuid).getName();
-            if (nombre == null)
-                nombre = "§7(Desconocido)";
+            if (nombre == null) nombre = "(Desconocido)";
 
             ItemStack head = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta meta = (SkullMeta) head.getItemMeta();
@@ -294,23 +355,20 @@ public final class GuiManager {
                 meta.setLore(List.of(
                         "§7Rol: " + role.getColoredName(),
                         "",
-                        role == com.protectium.protection.ProtectionRecord.MemberRole.OWNER ? "§e👑 Propietario"
+                        role == ProtectionRecord.MemberRole.OWNER
+                                ? "§e👑 Propietario — no se puede remover"
                                 : "§c▶ Click derecho para remover"));
                 head.setItemMeta(meta);
             }
             inv.setItem(slot, head);
             slot++;
-            if (slot % 9 == 8)
-                slot += 2; // Saltar bordes
-            if (slot > 43)
-                break;
+            if (slot % 9 == 8) slot += 2;
+            if (slot > 43) break;
         }
 
-        // Botón: Añadir miembro
         inv.setItem(39, crearItemConLore(Material.EMERALD, "§a§l+ Añadir Miembro",
                 List.of("§7Click para añadir un nuevo miembro.", "§7Escribe el nombre en el chat.")));
 
-        // Botón volver
         inv.setItem(41, crearItemConLore(Material.ARROW, "§c§l◄ Volver",
                 List.of("§7Regresa al menú principal.")));
 
@@ -322,7 +380,7 @@ public final class GuiManager {
     }
 
     // ---------------------------------------------------------------
-    // GUI de Lista Global (Admin)
+    // GUI Lista Global
     // ---------------------------------------------------------------
 
     public void abrirLista(Player jugador) {
@@ -335,38 +393,29 @@ public final class GuiManager {
         int totalPaginas = Math.max(1, (int) Math.ceil((double) todas.size() / porPagina));
         pagina = Math.max(0, Math.min(pagina, totalPaginas - 1));
 
-        int filas = 6;
-        Inventory inv = Bukkit.createInventory(new GuiHolder(GuiTipo.LISTA),
-                filas * 9, mensajes.guiTituloLista());
+        Inventory inv = Bukkit.createInventory(new GuiHolder(GuiTipo.LISTA), 54,
+                mensajes.guiTituloLista());
 
         ItemStack fondo = crearItem(Material.GRAY_STAINED_GLASS_PANE, "§8");
-        for (int i = 0; i < inv.getSize(); i++)
-            inv.setItem(i, fondo);
+        for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, fondo);
 
-        // Encabezado
         inv.setItem(4, crearItemConLore(Material.AMETHYST_BLOCK, "§b§l⬡ Protecciones",
-                List.of("§7Total: §b" + todas.size(), "§7Página: §b" + (pagina + 1) + "/" + totalPaginas)));
+                List.of("§7Total: §b" + todas.size(), "§7Página: §b" + (pagina + 1) + "/§b" + totalPaginas)));
 
-        // Contenido paginado
         int inicio = pagina * porPagina;
         int fin = Math.min(inicio + porPagina, todas.size());
         int slot = 10;
 
         for (int i = inicio; i < fin; i++) {
-            ProtectionRecord rec = todas.get(i);
-            inv.setItem(slot, crearItemProteccion(rec));
+            inv.setItem(slot, crearItemProteccion(todas.get(i)));
             slot++;
-            if (slot % 9 == 8)
-                slot += 2;
+            if (slot % 9 == 8) slot += 2;
         }
 
-        // Navegación
-        if (pagina > 0) {
+        if (pagina > 0)
             inv.setItem(45, crearItemConLore(Material.ARROW, "§c§l◄ Anterior", List.of()));
-        }
-        if (pagina < totalPaginas - 1) {
+        if (pagina < totalPaginas - 1)
             inv.setItem(53, crearItemConLore(Material.ARROW, "§a§l► Siguiente", List.of()));
-        }
         inv.setItem(49, crearItemConLore(Material.BARRIER, "§c§l✕ Cerrar", List.of()));
 
         GuiContext ctx = new GuiContext(GuiTipo.LISTA);
@@ -377,17 +426,15 @@ public final class GuiManager {
     }
 
     // ---------------------------------------------------------------
-    // GUI de Tipos (Información)
+    // GUI Tipos
     // ---------------------------------------------------------------
 
     public void abrirTipos(Player jugador) {
-        int filas = 3;
-        Inventory inv = Bukkit.createInventory(new GuiHolder(GuiTipo.TIPOS),
-                filas * 9, "§d§l⬡ §8Tipos de Protección");
+        Inventory inv = Bukkit.createInventory(new GuiHolder(GuiTipo.TIPOS), 27,
+                "§d§l⬡ §8Tipos de Protección");
 
         ItemStack fondo = crearItem(Material.GRAY_STAINED_GLASS_PANE, "§8");
-        for (int i = 0; i < inv.getSize(); i++)
-            inv.setItem(i, fondo);
+        for (int i = 0; i < inv.getSize(); i++) inv.setItem(i, fondo);
 
         inv.setItem(11, crearItemConLore(Material.AMETHYST_BLOCK, "§b§l⬡ Área",
                 List.of("§7Bloquea romper y colocar", "§7bloques en la zona.")));
@@ -402,7 +449,6 @@ public final class GuiManager {
 
         GuiContext ctx = new GuiContext(GuiTipo.TIPOS);
         contextos.put(jugador.getUniqueId(), ctx);
-
         jugador.openInventory(inv);
     }
 
@@ -444,28 +490,29 @@ public final class GuiManager {
         return crearItemConLore(getMaterialPorTipo(rec.getTipo()), getNombreTipo(rec.getTipo()),
                 List.of(
                         "§7 Radio: §b" + rec.getRadio(),
-                        "§7 Pos: §b" + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ(),
+                        "§7 Pos:   §b" + loc.getBlockX() + ", " + loc.getBlockY() + ", " + loc.getBlockZ(),
                         "§7 Mundo: §b" + loc.getWorld().getName(),
-                        "§8 Click para gestionar"));
+                        "",
+                        "§8▶ §fClick para gestionar"));
     }
 
-    private static Material getMaterialPorTipo(ProtectionType tipo) {
+    static Material getMaterialPorTipo(ProtectionType tipo) {
         return switch (tipo) {
-            case AREA -> Material.AMETHYST_BLOCK;
-            case SPAWN -> Material.SPAWNER;
-            case ENTRADA -> Material.SHIELD;
-            case FUEGO -> Material.FIRE_CORAL_BLOCK;
-            case REDSTONE -> Material.REDSTONE_BLOCK;
+            case AREA      -> Material.AMETHYST_BLOCK;
+            case SPAWN     -> Material.SPAWNER;
+            case ENTRADA   -> Material.SHIELD;
+            case FUEGO     -> Material.FIRE_CORAL_BLOCK;
+            case REDSTONE  -> Material.REDSTONE_BLOCK;
         };
     }
 
     private static String getNombreTipo(ProtectionType tipo) {
         return switch (tipo) {
-            case AREA -> "§b⬡ Área Protegida";
-            case SPAWN -> "§d⬡ Zona Sin Spawn";
-            case ENTRADA -> "§c⬡ Zona Restringida";
-            case FUEGO -> "§6⬡ Zona Ignífuga";
-            case REDSTONE -> "§5⬡ Zona Sin Redstone";
+            case AREA      -> "§b⬡ Área Protegida";
+            case SPAWN     -> "§d⬡ Zona Sin Spawn";
+            case ENTRADA   -> "§c⬡ Zona Restringida";
+            case FUEGO     -> "§6⬡ Zona Ignífuga";
+            case REDSTONE  -> "§5⬡ Zona Sin Redstone";
         };
     }
 }
