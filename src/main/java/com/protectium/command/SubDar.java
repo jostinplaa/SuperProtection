@@ -23,17 +23,21 @@ public final class SubDar implements SubComando {
     private final org.bukkit.configuration.ConfigurationSection config;
 
     public SubDar(ItemAuthority itemAuthority, Mensajes mensajes,
-                  org.bukkit.configuration.ConfigurationSection config) {
+            org.bukkit.configuration.ConfigurationSection config) {
         this.itemAuthority = itemAuthority;
         this.mensajes = mensajes;
         this.config = config;
     }
 
     @Override
-    public String nombre() { return "dar"; }
+    public String nombre() {
+        return "dar";
+    }
 
     @Override
-    public String descripcion() { return "Da un ítem de protección a un jugador."; }
+    public String descripcion() {
+        return "Da un ítem de protección a un jugador.";
+    }
 
     @Override
     public boolean ejecutar(CommandSender sender, String[] args) {
@@ -60,7 +64,8 @@ public final class SubDar implements SubComando {
         int radio;
         try {
             radio = Integer.parseInt(args[1]);
-            if (radio <= 0) throw new NumberFormatException();
+            if (radio <= 0)
+                throw new NumberFormatException();
         } catch (NumberFormatException e) {
             sender.sendMessage(mensajes.errorRadioInvalido(args[1]));
             return false;
@@ -95,12 +100,11 @@ public final class SubDar implements SubComando {
         jugador.sendMessage(mensajes.getPrefijo() + "§7Tipo: §b" + tipo.getConfigKey() + "§7 | Radio: §b" + radio);
         jugador.sendMessage(mensajes.getPrefijo() + "§7Colócalo en el mundo para activar la protección.");
 
-        // Efecto visual en el jugador
+        // Efecto visual en el jugador (compatible con 1.20+)
         jugador.getWorld().spawnParticle(
-            org.bukkit.Particle.SPELL,
-            jugador.getLocation(),
-            30, 0.3, 0.5, 0.3, 0.05
-        );
+                org.bukkit.Particle.CLOUD,
+                jugador.getLocation().add(0, 1, 0),
+                10, 0.3, 0.5, 0.3, 0.02);
 
         return true;
     }
