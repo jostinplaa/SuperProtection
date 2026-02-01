@@ -1,0 +1,112 @@
+# ╔════════════════════════════════════════════════════════════════════════════╗
+# ║                    ⚔  P R O T E C T I U M  ⚔                              ║
+# ║                         English Language File                              ║
+# ╚════════════════════════════════════════════════════════════════════════════╝
+
+prefix: "&8⛏ &b&lPROTECTIUM&8 »&r "
+prefix-error: "&8⛏ &c&lPROTECTIUM&8 »&r "
+prefix-success: "&8⛏ &a&lPROTECTIUM&8 »&r "
+separator: "&8═══════════════════════════════"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# COMMAND MESSAGES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+help:
+  header: "&8╔════════════════════════════════════════════════════════╗"
+  title: "&8║          &b&l⚔ PROTECTIUM &8- &7Available Commands &8║"
+  separator: "&8╠════════════════════════════════════════════════════════╣"
+  commands:
+    - "&8║  &b/prot dar <type> <radius> <player>"
+    - "&8║    &7→ Give a protection item"
+    - "&8║"
+    - "&8║  &b/prot crear <type> <radius> <name> [material]"
+    - "&8║    &7→ Create custom protection"
+    - "&8║"
+    - "&8║  &b/prot lista [world]"
+    - "&8║    &7→ Show active protections"
+    - "&8║"
+    - "&8║  &b/prot tipos"
+    - "&8║    &7→ List protection types"
+    - "&8║"
+    - "&8║  &b/prot tienda"
+    - "&8║    &7→ Open protection shop"
+    - "&8║"
+    - "&8║  &b/prot recargar"
+    - "&8║    &7→ Reload configuration"
+  footer: "&8╚════════════════════════════════════════════════════════╝"
+
+types-available: "&7Available types: {types}"
+
+error:
+  invalid-type: "&cInvalid type: &f{type}\n&cUse &f/prot tipos&c to see available types."
+  invalid-radius: "&cInvalid radius: &f{radius}&c. Must be a positive number."
+  radius-exceeds: "&cRadius &f{radius}&c exceeds maximum allowed: &f{max}"
+  player-not-found: "&cPlayer not found: &f{player}"
+  no-permission: "&cYou don't have permission."
+  usage: "&cIncorrect usage: &f{usage}"
+  inventory-full: "&cThe inventory of &f{player}&c is full."
+  shop-empty: "&cThe shop has no available items."
+  insufficient-funds: "&cInsufficient funds! You need &e${needed}&c more."
+  vault-disabled: "&cVault is not enabled. Purchases are free."
+
+success:
+  item-given: "&aProtection item &f{type}&a with radius &f{radius}&a given to &f{player}&a!"
+  protection-active: "&aProtection &f{type}&a activated! Radius: &f{radius} blocks."
+  protection-removed: "&aProtection &f{type}&a removed when breaking the block."
+  reload: "&aConfiguration reloaded successfully!"
+  protection-deleted: "&aProtection removed and block recovered."
+  shop-purchase: "&aYou purchased &f{item}&a for &e${price}&a! Balance: &e${balance}"
+  shop-add: "&aItem added to shop for &e${price}"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# EVENT MESSAGES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+protection:
+  blocked: "&cThis zone is protected by: &f{type}"
+  entry-denied: |
+    &c&l╔════════════════════════════╗
+    &c&l║   ⚠  PROTECTED ZONE  ⚠    ║
+    &c&l║                            ║
+    &c&l║     Access completely      ║
+    &c&l║         denied.            ║
+    &c&l║                            ║
+    &c&l╚════════════════════════════╝
+  spawn-blocked: "&cSpawning is blocked in this zone."
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# GUI TITLES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+gui:
+  main-title: "&8⛏ &b&lPROTECTIUM &8— &7Main"
+  list-title: "&8⛏ &b&lPROTECTIUM &8— &7Active Protections"
+  player-info-title: "&8⛏ &b&lPROTECTIUM &8— &7Info: {player}"
+  shop-title: "&8⛏ &b&lPROTECTIUM &8— &7Shop"
+  flags-title: "&8⛏ &b&lPROTECTIUM &8— &7Flags"
+  members-title: "&8⛏ &b&lPROTECTIUM &8— &7Members"
+  no-protections: "&7No active protections."
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ITEM RECEIVED MESSAGES
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+item-received:
+  line1: "&7You received a protection item!"
+  line2: "&7Type: &b{type}&7 | Radius: &b{radius}"
+  line3: "&7Place it in the world to activate protection."
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ITEM LORE
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+lore:
+  radius: "&7▪ Radius: &b{radius} blocks"
+  place-to-activate: "&e✦ Place to activate"
+  break-to-remove: "&e✦ Break to remove protection"
+  blocks: "&8Blocks: &7Break/Place/Explosions"
+  spawning: "&8Blocks: &7Hostile mob spawning"
+  entry: "&8Blocks: &7Player entry"
+  fire: "&8Blocks: &7Fire and lava"
+  redstone: "&8Blocks: &7Redstone circuits"

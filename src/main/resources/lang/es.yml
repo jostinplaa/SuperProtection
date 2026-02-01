@@ -1,0 +1,112 @@
+# ╔════════════════════════════════════════════════════════════════════════════╗
+# ║                    ⚔  P R O T E C T I U M  ⚔                              ║
+# ║                       Archivo de Idioma Español                            ║
+# ╚════════════════════════════════════════════════════════════════════════════╝
+
+prefix: "&8⛏ &b&lPROTECTIUM&8 »&r "
+prefix-error: "&8⛏ &c&lPROTECTIUM&8 »&r "
+prefix-success: "&8⛏ &a&lPROTECTIUM&8 »&r "
+separator: "&8═══════════════════════════════"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MENSAJES DE COMANDOS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+help:
+  header: "&8╔════════════════════════════════════════════════════════╗"
+  title: "&8║          &b&l⚔ PROTECTIUM &8- &7Comandos Disponibles &8║"
+  separator: "&8╠════════════════════════════════════════════════════════╣"
+  commands:
+    - "&8║  &b/prot dar <tipo> <radio> <jugador>"
+    - "&8║    &7→ Otorga un ítem de protección"
+    - "&8║"
+    - "&8║  &b/prot crear <tipo> <radio> <nombre> [material]"
+    - "&8║    &7→ Crea protección personalizada"
+    - "&8║"
+    - "&8║  &b/prot lista [mundo]"
+    - "&8║    &7→ Muestra protecciones activas"
+    - "&8║"
+    - "&8║  &b/prot tipos"
+    - "&8║    &7→ Lista tipos de protección"
+    - "&8║"
+    - "&8║  &b/prot tienda"
+    - "&8║    &7→ Abre la tienda de protecciones"
+    - "&8║"
+    - "&8║  &b/prot recargar"
+    - "&8║    &7→ Recarga configuración"
+  footer: "&8╚════════════════════════════════════════════════════════╝"
+
+types-available: "&7Tipos disponibles: {types}"
+
+error:
+  invalid-type: "&cTipo inválido: &f{type}\n&cUsa &f/prot tipos&c para ver los disponibles."
+  invalid-radius: "&cRadio inválido: &f{radius}&c. Debe ser un número positivo."
+  radius-exceeds: "&cEl radio &f{radius}&c excede el máximo permitido: &f{max}"
+  player-not-found: "&cJugador no encontrado: &f{player}"
+  no-permission: "&cNo tienes permisos suficientes."
+  usage: "&cUso incorrecto: &f{usage}"
+  inventory-full: "&cEl inventario de &f{player}&c está lleno."
+  shop-empty: "&cLa tienda no tiene ítems disponibles."
+  insufficient-funds: "&c¡Fondos insuficientes! Necesitas &e${needed}&c más."
+  vault-disabled: "&cVault no está habilitado. Las compras son gratis."
+
+success:
+  item-given: "&a¡Ítem de &f{type}&a con radio &f{radius}&a dado a &f{player}&a!"
+  protection-active: "&a¡Protección &f{type}&a activada! Radio: &f{radius} bloques."
+  protection-removed: "&aProtección &f{type}&a eliminada al romper el bloque."
+  reload: "&a¡Configuración recargada exitosamente!"
+  protection-deleted: "&aProtección eliminada y bloque recuperado."
+  shop-purchase: "&aHas comprado &f{item}&a por &e${price}&a! Saldo: &e${balance}"
+  shop-add: "&aÍtem agregado a la tienda por &e${price}"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MENSAJES DE EVENTOS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+protection:
+  blocked: "&cEsta zona está protegida por: &f{type}"
+  entry-denied: |
+    &c&l╔════════════════════════════╗
+    &c&l║   ⚠  ZONA PROTEGIDA  ⚠    ║
+    &c&l║                            ║
+    &c&l║  Acceso completamente      ║
+    &c&l║       denegado.            ║
+    &c&l║                            ║
+    &c&l╚════════════════════════════╝
+  spawn-blocked: "&cEl spawning está bloqueado en esta zona."
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# TÍTULOS DE GUI
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+gui:
+  main-title: "&8⛏ &b&lPROTECTIUM &8— &7Principal"
+  list-title: "&8⛏ &b&lPROTECTIUM &8— &7Protecciones Activas"
+  player-info-title: "&8⛏ &b&lPROTECTIUM &8— &7Info: {player}"
+  shop-title: "&8⛏ &b&lPROTECTIUM &8— &7Tienda"
+  flags-title: "&8⛏ &b&lPROTECTIUM &8— &7Flags"
+  members-title: "&8⛏ &b&lPROTECTIUM &8— &7Miembros"
+  no-protections: "&7No hay protecciones activas."
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# MENSAJES AL RECIBIR ÍTEM
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+item-received:
+  line1: "&7¡Recibiste un ítem de protección!"
+  line2: "&7Tipo: &b{type}&7 | Radio: &b{radius}"
+  line3: "&7Colócalo en el mundo para activar la protección."
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# LORE DE ÍTEMS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+lore:
+  radius: "&7▪ Radio: &b{radius} bloques"
+  place-to-activate: "&e✦ Colócalo para activar"
+  break-to-remove: "&e✦ Romperlo = elimina protección"
+  blocks: "&8Bloquea: &7Romper/Colocar/Explosiones"
+  spawning: "&8Bloquea: &7Spawning de mobs hostiles"
+  entry: "&8Bloquea: &7Entrada de jugadores"
+  fire: "&8Bloquea: &7Fuego y lava"
+  redstone: "&8Bloquea: &7Circuitos de redstone"

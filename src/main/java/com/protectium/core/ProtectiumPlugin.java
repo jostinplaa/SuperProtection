@@ -63,7 +63,8 @@ public final class ProtectiumPlugin extends JavaPlugin {
 
     private void inicializarComponentes() {
         this.registry = new ProtectionRegistry();
-        this.mensajes = new Mensajes(getConfig());
+        String language = getConfig().getString("language", "en");
+        this.mensajes = new Mensajes(this, language);
         this.messageManager = new MessageManager(this);
         this.itemAuthority = new ItemAuthority(this, messageManager);
         this.fxEngine = new FxEngine(getConfig());

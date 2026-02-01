@@ -1,5 +1,9 @@
 # ================================================================
-# PROTECTIUM — Configuración Principal
+# PROTECTIUM — Main Configuration
+# ================================================================
+# Language: "en" (English) or "es" (Spanish)
+language: "en"
+
 # ================================================================
 # REGLA CENTRAL (inmutable por diseño):
 #   1. Un admin ejecuta /prot dar <tipo> <radio> <jugador>
