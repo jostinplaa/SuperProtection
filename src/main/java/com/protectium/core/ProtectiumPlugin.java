@@ -57,7 +57,7 @@ public final class ProtectiumPlugin extends JavaPlugin {
         this.registry = new ProtectionRegistry();
         this.mensajes = new Mensajes(getConfig());
         this.messageManager = new MessageManager(this);
-        this.itemAuthority = new ItemAuthority(this);
+        this.itemAuthority = new ItemAuthority(this, messageManager);
         this.fxEngine = new FxEngine(getConfig());
         this.fxEngine.setPlugin(this);
         this.guiManager = new GuiManager(registry, mensajes);

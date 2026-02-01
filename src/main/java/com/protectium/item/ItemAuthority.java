@@ -37,15 +37,13 @@ public final class ItemAuthority {
     private final Plugin plugin;
     private final MessageManager messageManager;
 
-    public ItemAuthority(Plugin plugin) {
+    public ItemAuthority(Plugin plugin, MessageManager messageManager) {
         this.plugin = plugin;
         this.keyTipo = new NamespacedKey(plugin, "tipo");
         this.keyRadio = new NamespacedKey(plugin, "radio");
         this.keyToken = new NamespacedKey(plugin, "token");
         this.keyNombre = new NamespacedKey(plugin, "nombre");
-        
-        // Obtener MessageManager
-        this.messageManager = ((com.protectium.core.ProtectiumPlugin) plugin).getMessageManager();
+        this.messageManager = messageManager;
     }
 
     // ---------------------------------------------------------------
