@@ -1,0 +1,21 @@
+name: Protectium
+version: '1.0.0'
+description: "Protecciones basadas en cubos. Solo existen mientras el bloque esté colocado."
+api-version: '1.21'
+main: com.protectium.core.ProtectiumPlugin
+author: Protectium
+
+commands:
+  prot:
+    description: "Comando raíz de Protectium."
+    usage: "/prot <subcomando> [argumentos]"
+    permission: protectium.admin
+    aliases: [protectium, proteger]
+
+permissions:
+  protectium.admin:
+    description: "Acceso administrativo completo."
+    default: op
+  protectium.bypass:
+    description: "Inmune a todas las protecciones activas."
+    default: op

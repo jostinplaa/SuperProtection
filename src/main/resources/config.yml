@@ -1,0 +1,125 @@
+# ================================================================
+# PROTECTIUM — Configuración Principal
+# ================================================================
+# REGLA CENTRAL (inmutable por diseño):
+#   1. Un admin ejecuta /prot dar <tipo> <radio> <jugador>
+#   2. El jugador recibe un ítem con marca NBT única.
+#   3. El ítem NO hace nada en el inventario.
+#   4. Solo al COLOCARLO se activa la protección cúbica.
+#   5. Romper el bloque = protección eliminada. Sin excepciones.
+# ================================================================
+
+nbt:
+  namespace: "protectium"
+  version: 1
+
+mensajes:
+  prefijo: "§8⛏ §b§lPROTECTIUM§8 »§r "
+  error-prefijo: "§8⛏ §c§lPROTECTIUM§8 »§r "
+  exito-prefijo: "§8⛏ §a§lPROTECTIUM§8 »§r "
+  separador: "§8═══════════════════════════════"
+
+fx:
+  # Ticks entre renders de aristas del cubo
+  ticks-arista: 2
+  # Partículas en cada esquina al colocar
+  explosion-esquinas: 28
+  # Partículas ambientes por cara por tick
+  ambiente-por-cara: 4
+  # Pulso de brillo: min y máx (0.0 – 1.0)
+  pulso-min: 0.25
+  pulso-max: 1.0
+  # Duración completa de un ciclo de pulso en ticks
+  pulso-periodo: 40
+  # Partículas en explosión al romper
+  explosion-romper: 60
+
+tipos-proteccion:
+  # --------------------------------------------------
+  # AREA — bloqueo de romper/colocar dentro del cubo
+  # --------------------------------------------------
+  area:
+    habilitada: true
+    radio-por-defecto: 8
+    radio-maximo: 64
+    romper-bloques: true
+    colocar-bloques: true
+    incendiar-bloques: true
+    quemar-bloques: true
+    desaparecer-bloques: true
+    pistones: true
+    nombre-mostrar: "§b⬡ Área Protegida"
+    descripcion: "Bloquea romper y colocar bloques"
+    fx-arista: "DUST 0 180 255"
+    fx-esquina: "DUST 0 255 200"
+    fx-cara: "SPELL"
+    sonido-colocar: "BLOCK_GLASS_PLACE"
+    sonido-romper: "BLOCK_GLASS_BREAK"
+
+  # --------------------------------------------------
+  # SPAWN — bloqueo de spawning de mobs hostiles
+  # --------------------------------------------------
+  spawn:
+    habilitada: true
+    radio-por-defecto: 16
+    radio-maximo: 128
+    hostiles: true
+    neutros: false
+    nombre-mostrar: "§d⬡ Zona Sin Spawn"
+    descripcion: "Previene el spawn de mobs"
+    fx-arista: "DUST 220 60 220"
+    fx-esquina: "DUST 180 40 255"
+    fx-cara: "CRIT"
+    sonido-colocar: "ENTITY_ENDER_DRAGON_GROWL"
+    sonido-romper: "ENTITY_ENDER_DRAGON_DEATH"
+
+  # --------------------------------------------------
+  # ENTRADA — jugadores sin bypass no pueden entrar
+  # --------------------------------------------------
+  entrada:
+    habilitada: true
+    radio-por-defecto: 12
+    radio-maximo: 64
+    mensaje-bloqueo: "§c§l╔══════════════════════════╗\n§c§l║   ⚠  ZONA PROTEGIDA  ⚠   ║\n§c§l║  Acceso completamente    ║\n§c§l║       denegado.           ║\n§c§l╚══════════════════════════╝"
+    teleportar-atras: true
+    nombre-mostrar: "§c⬡ Zona Restringida"
+    descripcion: "Impide la entrada de jugadores"
+    fx-arista: "DUST 255 50 50"
+    fx-esquina: "DUST 255 150 0"
+    fx-cara: "FLAME"
+    sonido-colocar: "ENTITY_GUARDIAN_ATTACK"
+    sonido-romper: "ENTITY_GUARDIAN_DEATH"
+
+  # --------------------------------------------------
+  # FUEGO — propagación de fuego y lava bloqueada
+  # --------------------------------------------------
+  fuego:
+    habilitada: true
+    radio-por-defecto: 12
+    radio-maximo: 80
+    propagacion-fuego: true
+    encender-fuego: true
+    flujo-lava: true
+    nombre-mostrar: "§6⬡ Zona Ignífuga"
+    descripcion: "Bloquea fuego y lava"
+    fx-arista: "DUST 255 120 0"
+    fx-esquina: "DUST 255 230 0"
+    fx-cara: "FLAME"
+    sonido-colocar: "BLOCK_FIRE_EXTINGUISH"
+    sonido-romper: "FIRE_EXTINGUISH"
+
+  # --------------------------------------------------
+  # REDSTONE — activación de redstone bloqueada
+  # --------------------------------------------------
+  redstone:
+    habilitada: true
+    radio-por-defecto: 10
+    radio-maximo: 48
+    cambio-redstone: true
+    nombre-mostrar: "§5⬡ Zona Sin Redstone"
+    descripcion: "Deshabilita el redstone"
+    fx-arista: "DUST 160 0 255"
+    fx-esquina: "DUST 100 0 200"
+    fx-cara: "SPELL"
+    sonido-colocar: "BLOCK_REDSTONE_TORCH_TOGGLE_OFF"
+    sonido-romper: "BLOCK_REDSTONE_TORCH_TOGGLE_ON"
