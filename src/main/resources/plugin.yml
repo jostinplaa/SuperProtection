@@ -1,5 +1,5 @@
 name: Protectium
-version: '2.3.0'
+version: '2.3.1'
 description: "Protecciones basadas en cubos. Solo existen mientras el bloque esté colocado."
 api-version: '1.21'
 main: com.protectium.core.ProtectiumPlugin

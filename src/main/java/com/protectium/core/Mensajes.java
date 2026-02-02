@@ -287,6 +287,18 @@ public final class Mensajes {
     }
 
     // ---------------------------------------------------------------
+    // Zone Notification Messages (v2.3.1)
+    // ---------------------------------------------------------------
+
+    public String zoneEntered(String type) {
+        return get("zone.entered").replace("{type}", type);
+    }
+
+    public String zoneLeft() {
+        return get("zone.left");
+    }
+
+    // ---------------------------------------------------------------
     // System Messages
     // ---------------------------------------------------------------
 

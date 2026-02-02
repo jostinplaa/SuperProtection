@@ -146,6 +146,9 @@ public final class ProtectiumPlugin extends JavaPlugin {
                 new ListenerInventario(itemAuthority), this);
         getServer().getPluginManager().registerEvents(
                 new ListenerInteractProteccion(registry, guiManager, itemAuthority), this);
+        // v2.3.1 - Zone notifications
+        getServer().getPluginManager().registerEvents(
+                new ListenerZoneNotify(registry, mensajes), this);
     }
 
     private void iniciarTareas() {

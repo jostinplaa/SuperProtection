@@ -110,3 +110,11 @@ lore:
   entry: "&8Blocks: &7Player entry"
   fire: "&8Blocks: &7Fire and lava"
   redstone: "&8Blocks: &7Redstone circuits"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# ZONE NOTIFICATIONS (v2.3.1)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+zone:
+  entered: "&b⛏ &7Entering protected zone: &b{type}"
+  left: "&b⛏ &7Leaving protected zone"

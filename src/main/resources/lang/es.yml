@@ -110,3 +110,11 @@ lore:
   entry: "&8Bloquea: &7Entrada de jugadores"
   fire: "&8Bloquea: &7Fuego y lava"
   redstone: "&8Bloquea: &7Circuitos de redstone"
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# NOTIFICACIONES DE ZONA (v2.3.1)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+zone:
+  entered: "&b⛏ &7Entrando a zona protegida: &b{type}"
+  left: "&b⛏ &7Saliendo de zona protegida"
